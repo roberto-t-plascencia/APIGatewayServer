@@ -1,4 +1,4 @@
-﻿using Microservice.gateway.api.DbContexts;
+using Microservice.gateway.api.DbContexts;
 using Microservice.gateway.api.Model;
 using Microservice.gateway.api.VM;
 using Microsoft.AspNetCore.Mvc;
@@ -16,21 +16,23 @@ namespace Microservice.gateway.api.Repository
         private static Dictionary<string, Register> _context = new Dictionary<string, Register> {
             { "JuanArnao", new Register() {
                 Id = "9",
-                Email = " juan.arnao@grupodifare.com",
+                Email = " j_arnao@difare.com",
                 Password = "abc123",
                 Username = "JuanArnao",
                 Name = "Juan Arnao",
                 City = "Guayaquil",
-                PhoneNumber = 43731390
+                PhoneNumber = 43731390,
+                Active = true
             } },
             { "Ronald", new Register() {
                 Id = "10",
-                Email = "ronald.mateo@GrupoDifare.com",
+                Email = "r_mateo@difare.com",
                 Password = "abc123",
                 Username = "Ronald",
                 Name = "Ronald Mateo",
                 City = "Guayaquil",
-                PhoneNumber = 43731390
+                PhoneNumber = 43731390,
+                Active = true
             } },
             { "Barbara", new Register() {
                 Id = "11",
@@ -38,45 +40,50 @@ namespace Microservice.gateway.api.Repository
                 Password = "abc123",
                 Username = "Barbara",
                 Name = "Barbara Martínez",
-                City = "Guayaquil",
-                PhoneNumber = 44234234
+                City = "Quito",
+                PhoneNumber = 44234234,
+                Active = true
             } },
 
             { "Yovani", new Register() {
                 Id = "12",
-                Email = "yovani.ponce@grupodifare.com",
+                Email = "yponce@difare.com",
                 Password = "abc123",
                 Username = "Yovani",
                 Name = "Yovani Ponce",
                 City = "Guayaquil",
-                PhoneNumber = 43731390
+                PhoneNumber = 43731390,
+                Active = true
             } },
             { "robert", new Register() {
                 Id = "13",
-                Email = "roberto.plascencia@alphait.us",
+                Email = "roberto@alpha.com",
                 Password = "abc123",
                 Username = "robert",
                 Name = "roberto plascencia",
                 City = "San Diego",
-                PhoneNumber = 4324223
+                PhoneNumber = 4324223,
+                Active = true
             } },
             { "simon", new Register() {
                 Id = "14",
-                Email = "simon.elmoudi@alphait.us",
+                Email = "simon@alphait.com",
                 Password = "abc123",
                 Username = "simon",
                 Name = "Simon Elmoudi",
                 City = "Wilmington",
-                PhoneNumber = 2725344
+                PhoneNumber = 2725344,
+                Active = true
             } },
             { "harry", new Register() {
                 Id = "15",
-                Email = "harry@alphait.us",
+                Email = "harry@alphait.com",
                 Password = "abc123",
                 Username = "harry",
                 Name = "Harry Virk",
                 City = "Wilmington",
-                PhoneNumber = 2343242
+                PhoneNumber = 2343242,
+                Active = true
             } },
         };
 
@@ -94,6 +101,7 @@ namespace Microservice.gateway.api.Repository
                 {
                     var maxValue = _context.Aggregate((x, y) => int.Parse(x.Value.Id) > int.Parse(y.Value.Id) ? x : y).Value.Id;
                     user.Id = (int.Parse(maxValue) + 1).ToString();
+                    user.Active = true;
                     if (_context.TryAdd(user.Username, user))
                         retValue = user.Username;
                 }
@@ -105,9 +113,15 @@ namespace Microservice.gateway.api.Repository
             return retValue;
         }
 
-        public async Task<string> Remove(string username)
+        public Task<string> Remove(string username)
         {
-            return _context.Remove(username).ToString();
+            string returnValue = string.Empty;
+            if (_context.TryGetValue(username, out Register user))
+            {
+                user.Active = false;
+                returnValue = user.Username;
+            }
+            return Task.FromResult(returnValue);
         }
         public async Task<Register> GetByUsername(string username)
         {
