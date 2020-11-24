@@ -14,6 +14,6 @@ namespace Microservice.gateway.api.Model
         public string Username { get; set; }
         public string City { get; set; }
         public int PhoneNumber { get; set; }
-
+        public bool Active { get; set; }
     }
 }
