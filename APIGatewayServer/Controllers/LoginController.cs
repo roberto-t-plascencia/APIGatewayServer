@@ -1,6 +1,5 @@
 using Microservice.gateway.api.Model;
 using Microservice.gateway.api.Repository;
-using Microservice.gateway.api.VM;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
@@ -10,64 +9,65 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-
 namespace Microservice.gateway.api.Controllers
 {
-    //[Authorize] //for Active Directory integration
+    //[ApiVersion("1.0")]
+    //[Route("api/v{version:apiVersion}/[controller]")]
+    //[ApiController]
+    //[EnableCors("CORS")]
     [Route("api/[controller]")]
-    [ApiController]
-    public class LoginController : ControllerBase
-    {
-        private IUserRepository _userRepository;
-
-        public LoginController(IUserRepository repo)
+	[ApiController]
+	public class OrderController : ControllerBase
+	{
+        private IOrderRepository _orderRepository;
+        public OrderController(IOrderRepository orderRepository)
         {
-            _userRepository = repo;
+            _orderRepository = orderRepository;
         }
 
-        //[Authorize] //for Active Directory integration
+        //[Authorize] //for AD integration
+        [HttpPost]
         [Route("Add")]
-        [HttpPost]
-        public async Task<ActionResult> AddUser([FromBody]Register user)
+        public async Task<ActionResult> Add([FromBody] Order orderdet)
         {
-            string returnValue = await _userRepository.Add(user);
-            if (string.IsNullOrEmpty(returnValue))
-                return StatusCode(403);
-            else
-                return Ok(200);
+            orderdet.Placed = DateTime.Now;
+
+            string orderid = await _orderRepository.Add(orderdet);
+            return Ok(orderid);
         }
 
         //[Authorize] //for AD integration
-        [Route("Login")]
-        [HttpPost]
-        public async Task<ActionResult> UserLogin(Login login)
-        {
-            Register user = await _userRepository.Login(login);
-            if (user == null)
-                return StatusCode(403);
-            else
-                return Ok(200);
-        }
-
-        // [Authorize] //for AD integration
-        [Route("Deactivate/{username}")]
-        [HttpPost]
-        public async Task<ActionResult> Remove(string username)
-        {
-            var returnValue = await _userRepository.Remove(username);
-            if (string.IsNullOrEmpty(returnValue))
-                return StatusCode(404);
-            else
-                return Ok(200);
-        }
-
-        //[Authorize] //for AD integration
-        [Route("GetUsers")]
         [HttpGet]
-        public IEnumerable<Register> GetAll()
+        [Route("GetByCustomerId/{id}")]
+        public async Task<ActionResult> GetByCustomerId(string id)
         {
-            return _userRepository.GetUsers();
+            var orders = await _orderRepository.GetByCustomerId(id);
+            return Ok(orders);
         }
 
+        //[Authorize] //for AD integration
+        [HttpGet]
+        [Route("GetById/{id}")]
+        public async Task<ActionResult> GetById(string id)
+        {
+            var orderdet = await _orderRepository.GetById(id);
+            return Ok(orderdet);
+        }
+
+        //[Authorize] //for AD integration
+        [HttpPost]
+        [Route("Cancel/{id}")]
+        public async Task<IActionResult> Cancel(string id)
+        {
+            string resp = await _orderRepository.Cancel(id);
+            return Ok(resp);
+        }
+
+        [Route("GetOrders")]
+        [HttpGet]
+        public IEnumerable<Order> GetAll()
+        {
+            return _orderRepository.GetOrders();
+        }
     }
 }
