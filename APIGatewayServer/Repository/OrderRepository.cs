@@ -1,4 +1,4 @@
-﻿using Microservice.gateway.api.DbContexts;
+using Microservice.gateway.api.DbContexts;
 using Microservice.gateway.api.Model;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -24,7 +24,7 @@ namespace Microservice.gateway.api.Repository
             { "2", new Order() {
                 Id = "2",
                 Cost = "3.61",
-                CustomerId = "Bianca",
+                CustomerId = "Brian",
                 Placed = DateTime.Now,
                 ProductId = "32",
                 Status = "Complete"
@@ -84,3 +84,4 @@ namespace Microservice.gateway.api.Repository
         }
     }
 }
+
