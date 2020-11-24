@@ -50,13 +50,13 @@ namespace Microservice.gateway.api.Controllers
         }
 
         // [Authorize] //for AD integration
-        [Route("Remove")]
+        [Route("Deactivate/{username}")]
         [HttpPost]
         public async Task<ActionResult> Remove(string username)
         {
             var returnValue = await _userRepository.Remove(username);
             if (string.IsNullOrEmpty(returnValue))
-                return StatusCode(403);
+                return StatusCode(404);
             else
                 return Ok(200);
         }
@@ -70,4 +70,3 @@ namespace Microservice.gateway.api.Controllers
         }
 
     }
-}
